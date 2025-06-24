@@ -1,11 +1,8 @@
 {
   "name": "insee-vies-proxy",
   "version": "1.0.0",
+  "main": "api/vies.js",
   "type": "module",
-  "main": "index.js",
-  "scripts": {
-    "vercel-build": ""
-  },
   "dependencies": {
     "soap": "^0.43.0"
   }
