@@ -8,7 +8,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const apiUrl = `https://ec.europa.eu/taxation_customs/vies/rest-api/ms/${country}/vatnumber/${country}${vat}`;
+    // Correction de l’URL : suppression de la redondance du code pays dans le numéro de TVA
+    const apiUrl = `https://ec.europa.eu/taxation_customs/vies/rest-api/ms/${country}/vatnumber/${vat}`;
     const response = await fetch(apiUrl);
 
     if (!response.ok) {
