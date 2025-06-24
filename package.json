@@ -1,8 +1,0 @@
-{
-  "name": "insee-vies-proxy",
-  "version": "1.0.0",
-  "type": "module",
-  "dependencies": {
-    "soap": "^0.43.0"
-  }
-}
