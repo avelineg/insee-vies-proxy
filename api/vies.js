@@ -1,7 +1,5 @@
-// Fichier: api/vies.js
-
+// api/vies.js
 import axios from 'axios';
-import { parseStringPromise } from 'xml2js';
 
 export default async function handler(req, res) {
   const { country, vat } = req.query;
@@ -10,36 +8,34 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Paramètres manquants: country et vat requis' });
   }
 
-  const body = `
-    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:ec.europa.eu:taxud:vies:services:checkVat:types">
-      <soapenv:Header/>
-      <soapenv:Body>
-        <urn:checkVat>
-          <urn:countryCode>${country}</urn:countryCode>
-          <urn:vatNumber>${vat}</urn:vatNumber>
-        </urn:checkVat>
-      </soapenv:Body>
-    </soapenv:Envelope>
-  `;
+  const xmlBody = `<?xml version="1.0" encoding="UTF-8"?>
+    <soap:Envelope
+      xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+      xmlns:tns="urn:ec.europa.eu:taxud:vies:services:checkVat:types">
+      <soap:Body>
+        <tns:checkVat>
+          <tns:countryCode>${country}</tns:countryCode>
+          <tns:vatNumber>${vat}</tns:vatNumber>
+        </tns:checkVat>
+      </soap:Body>
+    </soap:Envelope>`;
 
   try {
-    const response = await axios.post(
+    const { data } = await axios.post(
       'https://ec.europa.eu/taxation_customs/vies/services/checkVatService',
-      body,
+      xmlBody,
       {
         headers: {
-          'Content-Type': 'text/xml; charset=utf-8',
-          'SOAPAction': ''
-        }
+          'Content-Type': 'text/xml;charset=UTF-8',
+          'SOAPAction': '',
+        },
+        timeout: 10000,
       }
     );
 
-    const result = await parseStringPromise(response.data, { explicitArray: false });
-    const checkVatResponse = result['soap:Envelope']['soap:Body']['checkVatResponse'];
-
-    res.status(200).json(checkVatResponse);
+    res.status(200).json({ raw: data }); // tu peux parser si besoin
   } catch (error) {
-    console.error('Erreur SOAP manuelle :', error);
-    res.status(500).json({ error: "Erreur lors de la vérification TVA" });
+    console.error('Erreur SOAP Axios :', error.message);
+    res.status(500).json({ error: 'Erreur lors de la requête SOAP avec Axios' });
   }
 }
