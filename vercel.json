@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/api/vies",
+      "dest": "api/vies.js"
+    }
+  ]
+}
